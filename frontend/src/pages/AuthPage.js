@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, UserRound, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, UserRound, Sun, Moon, AlertCircle } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext.js";
+import { useAuth } from "../context/AuthContext.js";
 import "./AuthPage.css";
 
 import loginImage from "../assets/hiremind-login.png";
@@ -23,11 +24,24 @@ function AuthPage({ mode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
+  const { login, signup } = useAuth();
 
   const isPathSignup = location.pathname.includes("signup");
   const [isSignup, setIsSignup] = useState(mode ? mode === "signup" : isPathSignup);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Form states
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     if (mode) {
@@ -42,8 +56,45 @@ function AuthPage({ mode }) {
   };
 
   const handleSwitchMode = (targetMode) => {
+    setAuthError("");
     setIsSignup(targetMode === "signup");
     navigate(targetMode === "signup" ? "/signup" : "/login");
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError("");
+    setAuthLoading(true);
+
+    try {
+      await login(loginEmail, loginPassword);
+      navigate("/");
+    } catch (err) {
+      setAuthError(err.message || "Invalid email or password");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError("");
+
+    if (signupPassword !== signupConfirmPassword) {
+      setAuthError("Passwords do not match");
+      return;
+    }
+
+    setAuthLoading(true);
+
+    try {
+      await signup(signupName, signupEmail, signupPassword);
+      navigate("/");
+    } catch (err) {
+      setAuthError(err.message || "Could not create account");
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   return (
@@ -114,6 +165,13 @@ function AuthPage({ mode }) {
               </span>
             </Link>
 
+            {authError && (
+              <div className="auth-error-alert" role="alert">
+                <AlertCircle size={15} />
+                <span>{authError}</span>
+              </div>
+            )}
+
             <div className="auth-form-panes">
               <div
                 className={`auth-form-pane pane-login ${!isSignup ? "is-active" : "is-hidden"}`}
@@ -144,12 +202,21 @@ function AuthPage({ mode }) {
                   <span />
                 </div>
 
-                <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+                <form className="auth-form" onSubmit={handleLoginSubmit}>
                   <div className="form-group">
                     <label>Email address</label>
                     <div className="input-wrapper">
                       <Mail size={17} />
-                      <input type="email" placeholder="you@example.com" />
+                      <input
+                        type="email"
+                        placeholder="you@example.com"
+                        value={loginEmail}
+                        onChange={(e) => {
+                          setLoginEmail(e.target.value);
+                          setAuthError("");
+                        }}
+                        required
+                      />
                     </div>
                   </div>
 
@@ -166,6 +233,12 @@ function AuthPage({ mode }) {
                       <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
+                        value={loginPassword}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value);
+                          setAuthError("");
+                        }}
+                        required
                       />
                       <button
                         type="button"
@@ -177,9 +250,13 @@ function AuthPage({ mode }) {
                     </div>
                   </div>
 
-                  <button className="submit-button" type="submit">
-                    Log in
-                    <span>?</span>
+                  <button
+                    className="submit-button"
+                    type="submit"
+                    disabled={authLoading}
+                  >
+                    {authLoading ? "Logging in..." : "Log in"}
+                    {!authLoading && <span>?</span>}
                   </button>
                 </form>
 
@@ -223,12 +300,23 @@ function AuthPage({ mode }) {
                   <span />
                 </div>
 
-                <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+                <form className="auth-form" onSubmit={handleSignupSubmit}>
                   <div className="form-group">
                     <label>Full name</label>
                     <div className="input-wrapper">
                       <UserRound size={17} />
-                      <input type="text" placeholder="John Doe" />
+                      <input
+                        type="text"
+                        placeholder="John Doe"
+                        value={signupName}
+                        onChange={(e) => {
+                          setSignupName(e.target.value);
+                          setAuthError("");
+                        }}
+                        required
+                        minLength={2}
+                        maxLength={80}
+                      />
                     </div>
                   </div>
 
@@ -236,7 +324,16 @@ function AuthPage({ mode }) {
                     <label>Email address</label>
                     <div className="input-wrapper">
                       <Mail size={17} />
-                      <input type="email" placeholder="you@example.com" />
+                      <input
+                        type="email"
+                        placeholder="you@example.com"
+                        value={signupEmail}
+                        onChange={(e) => {
+                          setSignupEmail(e.target.value);
+                          setAuthError("");
+                        }}
+                        required
+                      />
                     </div>
                   </div>
 
@@ -246,7 +343,15 @@ function AuthPage({ mode }) {
                       <Lock size={17} />
                       <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Create a strong password"
+                        placeholder="Create a strong password (min 8 chars)"
+                        value={signupPassword}
+                        onChange={(e) => {
+                          setSignupPassword(e.target.value);
+                          setAuthError("");
+                        }}
+                        required
+                        minLength={8}
+                        maxLength={128}
                       />
                       <button
                         type="button"
@@ -265,6 +370,14 @@ function AuthPage({ mode }) {
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm your password"
+                        value={signupConfirmPassword}
+                        onChange={(e) => {
+                          setSignupConfirmPassword(e.target.value);
+                          setAuthError("");
+                        }}
+                        required
+                        minLength={8}
+                        maxLength={128}
                       />
                       <button
                         type="button"
@@ -282,9 +395,13 @@ function AuthPage({ mode }) {
                     </div>
                   </div>
 
-                  <button className="submit-button" type="submit">
-                    Create account
-                    <span>?</span>
+                  <button
+                    className="submit-button"
+                    type="submit"
+                    disabled={authLoading}
+                  >
+                    {authLoading ? "Creating account..." : "Create account"}
+                    {!authLoading && <span>?</span>}
                   </button>
                 </form>
 
@@ -313,4 +430,3 @@ function AuthPage({ mode }) {
 }
 
 export default AuthPage;
-

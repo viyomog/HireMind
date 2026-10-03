@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext.js'
+import { AuthProvider } from './context/AuthContext.js'
 import { Layout } from './components/layout/Layout.js'
 import { LandingPage } from './pages/LandingPage.js'
 import AuthPage from './pages/AuthPage.js'
@@ -17,18 +18,20 @@ if (typeof window !== 'undefined') {
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<LandingPage />} />
-          </Route>
-          <Route element={<AuthPage />}>
-            <Route path="/login" element={null} />
-            <Route path="/signup" element={null} />
-          </Route>
-          <Route path="*" element={<Layout><LandingPage /></Layout>} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<LandingPage />} />
+            </Route>
+            <Route element={<AuthPage />}>
+              <Route path="/login" element={null} />
+              <Route path="/signup" element={null} />
+            </Route>
+            <Route path="*" element={<Layout><LandingPage /></Layout>} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   )
 }
