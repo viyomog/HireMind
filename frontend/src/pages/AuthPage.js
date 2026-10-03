@@ -64,13 +64,19 @@ function AuthPage({ mode }) {
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        <section className="auth-visual">
+        <section
+          className="auth-visual"
+          onContextMenu={(e) => e.preventDefault()}
+        >
           <img
             src={loginImage}
             alt="HireMind Login"
             className={`auth-visual-image auth-img-login ${!isSignup ? "is-active" : "is-hidden"}`}
             loading="eager"
             decoding="sync"
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
           />
           <img
             src={signupImage}
@@ -78,6 +84,9 @@ function AuthPage({ mode }) {
             className={`auth-visual-image auth-img-signup ${isSignup ? "is-active" : "is-hidden"}`}
             loading="eager"
             decoding="sync"
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
           />
         </section>
 
@@ -304,3 +313,4 @@ function AuthPage({ mode }) {
 }
 
 export default AuthPage;
+

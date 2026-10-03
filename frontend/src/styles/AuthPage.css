@@ -52,6 +52,22 @@
   transform: translateX(0);
   transition: transform 0.65s cubic-bezier(0.65, 0, 0.35, 1), background 0.3s ease;
   z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
+.auth-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: auto;
+  background: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .auth-form-section {
@@ -85,6 +101,11 @@
   object-position: center top;
   position: absolute;
   inset: 0;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
   transition:
     opacity 0.45s ease-in-out 0.12s,
     transform 0.65s cubic-bezier(0.65, 0, 0.35, 1);
@@ -93,7 +114,7 @@
 
 .auth-visual-image.is-active {
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: none;
   transform: scale(1);
   z-index: 2;
 }
@@ -783,3 +804,4 @@ html.dark .auth-theme-toggle:hover {
     font-size: 23px;
   }
 }
+
