@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, UserRound } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, UserRound, Sun, Moon } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext.js";
 import "./AuthPage.css";
 
 import loginImage from "../assets/hiremind-login.png";
@@ -19,6 +20,7 @@ if (typeof window !== "undefined") {
 function AuthPage({ mode }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
 
   const isPathSignup = location.pathname.includes("signup");
   const [isSignup, setIsSignup] = useState(mode ? mode === "signup" : isPathSignup);
@@ -45,10 +47,20 @@ function AuthPage({ mode }) {
   return (
     <main className="auth-page">
       <div className={`auth-container ${isSignup ? "mode-signup" : "mode-login"}`}>
-        <Link to="/" className="auth-back">
+        <Link to="/" className="auth-back" aria-label="Go to home">
           <ArrowLeft size={16} />
           <span>Back</span>
         </Link>
+
+        <button
+          type="button"
+          className="auth-theme-toggle"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+          title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+        >
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
 
         <section className="auth-visual">
           <img
@@ -68,10 +80,20 @@ function AuthPage({ mode }) {
         </section>
 
         <section className="auth-form-section">
-          <Link to="/" className="auth-back auth-back-mobile">
+          <Link to="/" className="auth-back auth-back-mobile" aria-label="Go to home">
             <ArrowLeft size={16} />
             <span>Back</span>
           </Link>
+
+          <button
+            type="button"
+            className="auth-theme-toggle auth-theme-toggle-mobile"
+            onClick={toggleTheme}
+            aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+            title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
 
           <div className="auth-form-wrapper">
             <Link to="/" className="auth-logo">
@@ -100,7 +122,7 @@ function AuthPage({ mode }) {
                   </button>
 
                   <button className="social-button" type="button">
-                    <span className="github-icon">●</span>
+                    <span className="github-icon">?</span>
                     Continue with GitHub
                   </button>
                 </div>
@@ -146,7 +168,7 @@ function AuthPage({ mode }) {
 
                   <button className="submit-button" type="submit">
                     Log in
-                    <span>→</span>
+                    <span>?</span>
                   </button>
                 </form>
 
@@ -157,7 +179,7 @@ function AuthPage({ mode }) {
                     className="auth-switch-link"
                     onClick={() => handleSwitchMode("signup")}
                   >
-                    Sign up →
+                    Sign up ?
                   </button>
                 </div>
               </div>
@@ -179,7 +201,7 @@ function AuthPage({ mode }) {
                   </button>
 
                   <button className="social-button" type="button">
-                    <span className="github-icon">●</span>
+                    <span className="github-icon">?</span>
                     Continue with GitHub
                   </button>
                 </div>
@@ -251,7 +273,7 @@ function AuthPage({ mode }) {
 
                   <button className="submit-button" type="submit">
                     Create account
-                    <span>→</span>
+                    <span>?</span>
                   </button>
                 </form>
 
@@ -262,7 +284,7 @@ function AuthPage({ mode }) {
                     className="auth-switch-link"
                     onClick={() => handleSwitchMode("login")}
                   >
-                    Log in →
+                    Log in ?
                   </button>
                 </div>
               </div>

@@ -5,7 +5,9 @@ const ThemeContext = createContext()
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
     try {
-      return localStorage.getItem('hiremind-theme') === 'dark'
+      const saved = localStorage.getItem('hiremind-theme')
+      if (saved) return saved === 'dark'
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
     } catch {
       return false
     }
@@ -14,6 +16,16 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     try {
       localStorage.setItem('hiremind-theme', isDark ? 'dark' : 'light')
+      const root = document.documentElement
+      if (isDark) {
+        root.classList.add('theme-dark')
+        root.classList.add('dark')
+        root.style.colorScheme = 'dark'
+      } else {
+        root.classList.remove('theme-dark')
+        root.classList.remove('dark')
+        root.style.colorScheme = 'light'
+      }
     } catch {}
   }, [isDark])
 
