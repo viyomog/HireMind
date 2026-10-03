@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, UserRound, Sun, Moon } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext.js";
 import "./AuthPage.css";
@@ -117,13 +119,13 @@ function AuthPage({ mode }) {
 
                 <div className="social-buttons">
                   <button className="social-button" type="button">
-                    <span className="google-icon">G</span>
-                    Continue with Google
+                    <FcGoogle size={19} />
+                    <span>Continue with Google</span>
                   </button>
 
                   <button className="social-button" type="button">
-                    <span className="github-icon">?</span>
-                    Continue with GitHub
+                    <FaGithub size={18} />
+                    <span>Continue with GitHub</span>
                   </button>
                 </div>
 
@@ -196,13 +198,13 @@ function AuthPage({ mode }) {
 
                 <div className="social-buttons">
                   <button className="social-button" type="button">
-                    <span className="google-icon">G</span>
-                    Continue with Google
+                    <FcGoogle size={19} />
+                    <span>Continue with Google</span>
                   </button>
 
                   <button className="social-button" type="button">
-                    <span className="github-icon">?</span>
-                    Continue with GitHub
+                    <FaGithub size={18} />
+                    <span>Continue with GitHub</span>
                   </button>
                 </div>
 
