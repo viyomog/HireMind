@@ -1,34 +1,8 @@
 import crypto from "crypto";
-import Redis from "ioredis";
+import redis from "../config/redis.js";
 
 const DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
-
-let redisClient = null;
 const memoryStore = new Map();
-
-if (process.env.REDIS_URL) {
-  try {
-    redisClient = new Redis(process.env.REDIS_URL, {
-      maxRetriesPerRequest: 3,
-      retryStrategy(times) {
-        return Math.min(times * 100, 3000);
-      },
-    });
-
-    redisClient.on("connect", () => {
-      console.log("Redis connected successfully");
-    });
-
-    redisClient.on("error", (err) => {
-      console.warn("Redis error (falling back to memory store):", err.message);
-    });
-  } catch (err) {
-    console.warn("Could not initialize Redis, using memory store:", err.message);
-    redisClient = null;
-  }
-} else {
-  console.log("REDIS_URL not provided. Using in-memory session store.");
-}
 
 function generateSessionId() {
   return crypto.randomBytes(32).toString("hex");
@@ -42,14 +16,12 @@ export async function createSession(userId, data = {}, ttlSeconds = DEFAULT_TTL_
     createdAt: new Date().toISOString(),
   };
 
-  const serialized = JSON.stringify(sessionData);
-
-  if (redisClient && redisClient.status === "ready") {
+  if (redis) {
     try {
-      await redisClient.setex(`session:${sessionId}`, ttlSeconds, serialized);
+      await redis.set(`session:${sessionId}`, sessionData, { ex: ttlSeconds });
       return sessionId;
     } catch (err) {
-      console.warn("Redis write failed, falling back to memory:", err.message);
+      console.warn("Upstash Redis set error, falling back to memory:", err.message);
     }
   }
 
@@ -61,12 +33,13 @@ export async function createSession(userId, data = {}, ttlSeconds = DEFAULT_TTL_
 export async function getSession(sessionId) {
   if (!sessionId) return null;
 
-  if (redisClient && redisClient.status === "ready") {
+  if (redis) {
     try {
-      const raw = await redisClient.get(`session:${sessionId}`);
-      return raw ? JSON.parse(raw) : null;
+      const data = await redis.get(`session:${sessionId}`);
+      if (!data) return null;
+      return typeof data === "string" ? JSON.parse(data) : data;
     } catch (err) {
-      console.warn("Redis read failed, checking memory:", err.message);
+      console.warn("Upstash Redis get error, checking memory fallback:", err.message);
     }
   }
 
@@ -84,11 +57,11 @@ export async function getSession(sessionId) {
 export async function destroySession(sessionId) {
   if (!sessionId) return;
 
-  if (redisClient && redisClient.status === "ready") {
+  if (redis) {
     try {
-      await redisClient.del(`session:${sessionId}`);
+      await redis.del(`session:${sessionId}`);
     } catch (err) {
-      console.warn("Redis delete error:", err.message);
+      console.warn("Upstash Redis del error:", err.message);
     }
   }
 
