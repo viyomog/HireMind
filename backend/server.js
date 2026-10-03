@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { connectDB } from "./src/config/db.js";
 import authRoutes from "./src/routes/authRoutes.js";
+import onboardingRoutes from "./src/routes/onboardingRoutes.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 app.use(cookieParser(process.env.SESSION_SECRET || "hiremind-secret"));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/onboarding", onboardingRoutes);
 
 app.get("/", (req, res) => {
   res.json({

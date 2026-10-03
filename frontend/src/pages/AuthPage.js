@@ -67,8 +67,12 @@ function AuthPage({ mode }) {
     setAuthLoading(true);
 
     try {
-      await login(loginEmail, loginPassword);
-      navigate("/");
+      const data = await login(loginEmail, loginPassword);
+      if (data?.user && !data.user.onboardingCompleted) {
+        navigate("/onboarding");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setAuthError(err.message || "Invalid email or password");
     } finally {
@@ -89,7 +93,7 @@ function AuthPage({ mode }) {
 
     try {
       await signup(signupName, signupEmail, signupPassword);
-      navigate("/");
+      navigate("/onboarding");
     } catch (err) {
       setAuthError(err.message || "Could not create account");
     } finally {
