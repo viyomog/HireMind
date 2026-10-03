@@ -16,7 +16,7 @@ export function WelcomeModal({ onStart, userName }) {
     <div className={`onboarding-modal-overlay ${isClosing ? "fade-out" : "fade-in"}`}>
       <div className={`onboarding-modal-card ${isClosing ? "scale-down" : "scale-up"}`}>
         <div className="onboarding-modal-icon-wrap">
-          <img src={logo} alt="HireMind" className="onboarding-modal-logo" />
+          <img src={logo} alt="HireMind" className="onboarding-modal-logo" style={{ width: "56px", height: "56px", maxWidth: "56px", maxHeight: "56px", objectFit: "contain" }} />
           <div className="onboarding-sparkle-badge">
             <Sparkles size={14} />
           </div>

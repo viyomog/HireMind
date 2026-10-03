@@ -407,7 +407,7 @@ export default function OnboardingPage() {
             {/* Top Brand */}
             <div className="onboarding-brand-header">
               <div className="onboarding-logo-combo">
-                <img src={logo} alt="HireMind" className="onboarding-logo-img" />
+                <img src={logo} alt="HireMind" className="onboarding-logo-img" style={{ width: "38px", height: "38px", maxWidth: "38px", maxHeight: "38px", objectFit: "contain" }} />
                 <div>
                   <h1 className="onboarding-brand-title">HireMind</h1>
                   <span className="onboarding-brand-sub">Your AI-Powered Career Coach</span>
